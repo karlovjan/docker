@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  haproxy:
+    image: haproxy:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    depends_on:
+      - tomcat1
+      - tomcat2
+    networks:
+      - app-network
+
+  tomcat1:
+    image: tomcat:9.0-jdk11-slim
+    ports:
+      - "8080" #expose for debugging purposes, remove in production
+    volumes:
+      - ./webapp1:/usr/local/tomcat/webapps/webapp1.war
+    networks:
+      - app-network
+
+  tomcat2:
+    image: tomcat:9.0-jdk11-slim
+    ports:
+      - "8081" #expose for debugging purposes, remove in production
+    volumes:
+      - ./webapp2:/usr/local/tomcat/webapps/webapp2.war
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
