@@ -1,4 +1,12 @@
 
+>https://hub.docker.com/_/haproxy/
+
+
+docker compose up --detach
+docker compose up -d
+
+docker compose down
+
 **Explanation and Important Considerations:**
 
 1.  **Docker Compose File:**
@@ -49,4 +57,35 @@
     * Implement proper logging and monitoring.
     * Adjust timeouts according to the application needs.
     * For SSL/TLS, configure haproxy to handle the SSL termination.
+
+
+
+Logging
+global
+log stdout format raw local0 info
+
+default 
+log global
+
+frontend
+log stdout format raw local0 info
+
+backend
+log stdout format raw local0 info
+
+
+modify TokenAuthPlugin
+ebr-web.xml
+add
+<property name="cookiesSecure" value="false" />
+to tokenAuthPlugin
+
+
+Streamer
+Connection refused (Connection refused): localhost:10080
+modify
+streamer-distro\config\streamer.properties
+session.authenticationUrl=http://tomcat1:8080/...
+
+
 
