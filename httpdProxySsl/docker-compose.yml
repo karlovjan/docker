@@ -1,0 +1,48 @@
+# version: '3.8' the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion
+
+services:
+  apache-httpd:
+    image: httpd:2.4
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./httpd.conf:/usr/local/apache2/conf/httpd.conf
+      - ./httpd-ssl.conf:/usr/local/apache2/conf/extra/httpd-ssl.conf
+      - ./httpd-certs/client.crt:/usr/local/apache2/certs/ebr.fio.cz.crt
+      - ./httpd-certs/clientKey.pem:/usr/local/apache2/certs/ebr.fio.cz.pem
+    depends_on:
+      - tomcat1
+      - streamer1
+    networks:
+      - app-network
+
+  tomcat1:
+    image: tomcat:9.0-jdk11-slim
+    ports:
+      - "10080:10080"
+    volumes:
+      - ./server.xml:/usr/local/tomcat/conf/server.xml
+      - ./ebroker-web-0.0.1-SNAPSHOT.war:/usr/local/tomcat/webapps/ebroker_java.war
+      - ./tomcat-ssh:/root/.ssh
+      - ./cacerts:/usr/local/openjdk-11/lib/security/cacerts
+    networks:
+      - app-network
+
+  streamer1:
+    image: openjdk:11-jdk-slim
+    # port mapping is needed only for inbound ports to our application
+    ports:
+      - "11080:11080"
+    volumes:
+      - ./streamer-distro:/usr/src/app
+      - ./cacerts:/usr/local/openjdk-11/lib/security/cacerts
+    working_dir: /usr/src/app
+#    command: ["./start"]
+    entrypoint: ["/bin/bash", "streamer"]
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
