@@ -5,8 +5,10 @@ services:
     image: haproxy:3.1
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+      - ./ebr.fio.cz.pem:/etc/ssl/certs/ebr.fio.cz.pem
     depends_on:
       - tomcat1
       - streamer1
@@ -29,7 +31,7 @@ services:
     image: openjdk:11-jdk-slim
     # port mapping is needed only for inbound ports to our application
     ports:
-      - "24080:24080"
+      - "11080:11080"
     volumes:
       - ./streamer-distro:/usr/src/app
       - ./cacerts:/usr/local/openjdk-11/lib/security/cacerts
